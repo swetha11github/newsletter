@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stopwatch</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+    .stopwatch{
+            border: 2px solid lightgray;
+            width: 30%;
+            height: 35vh;
+            margin: 30px;
+        }
+        #display{
+            margin: 20px 20px 0px 20px;
+            font-size: 3em;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .stopwatch h1{
+            margin: 20px 20px 0px 20px;
+            color: #1a73e8;
+            border-bottom: 1px solid #1a73e8;
+        }
+        h1 i{
+            margin: 10px;
+        }
+        .stopwatch button{
+            width: 50px;
+            height: 30px;
+            margin: 20px 0px 20px 20px;
+            border: none;
+        }
+        button:hover{
+            background-color: #1a73e8;
+            color: white;
+        }
+</style>
+</head>
+<body>
+    <h1>Stop watch clock</h1>
+    <div class="stopwatch">
+        <h1><i class="fa fa-clock-o"></i>STOPWATCH</h1>
+        <span id="display">00:00:00</span>
+        <button id="startStopBtn">Start</button>
+        <button id="resetBtn">Reset</button>
+    </div>
+<script>
+    let stopwatch;
+    let running = false;
+    let startTime;
+    let nullTime = null;
+
+    function formatTime(time) {
+        let hours = Math.floor(time / 3600000);
+        let minutes = Math.floor((time % 3600000) / 60000);
+        let seconds = Math.floor((time % 60000) / 1000);
+        let milliseconds = Math.floor(time % 1000);
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+    }
+
+    function update() {
+    if (running) {
+        nullTime = Date.now() - startTime;
+        document.getElementById('display').textContent = formatTime(nullTime);
+    }
+    }
+
+    document.getElementById('startStopBtn').addEventListener('click', function() {
+    if (running) {
+        clearInterval(stopwatch);
+        running = false;
+        this.textContent = 'Start';
+    } else {
+        startTime = Date.now() - nullTime;
+        stopwatch = setInterval(update, 10);
+        running = true;
+        this.textContent = 'Stop';
+    }
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', function() {
+    clearInterval(stopwatch);
+    running = false;
+    nullTime = 0;
+    document.getElementById('display').textContent = formatTime(nullTime);
+    document.getElementById('startStopBtn').textContent = 'Start';
+    });
+</script>
+</body>
+</html>
