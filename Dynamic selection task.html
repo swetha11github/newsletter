@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select elements</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .whole{
+            margin: 10px 10px;
+            width: 100%;
+            display: flex;
+        }
+        .container
+        {
+            background-color: whitesmoke;
+            height: 100vh;
+            width: 50%;
+            margin: 0px;           
+        }
+        .city{
+            background-color: purple;
+            margin: 10px 20px;
+            padding: 10px;
+            color: #f6f7a9;
+        }
+        #success
+        {
+            margin: 20px;
+            width: 50%;
+            border: 2px solid green;
+            color: green;
+            background-color: rgb(204, 247, 204);
+        }
+        #warning{
+            margin: 20px;
+            width: 50%;
+            border: 2px solid red;
+            color: red;
+            background-color: rgb(245, 197, 197);
+        }
+        .container2{
+            width: 50%;
+            margin: 0px;
+            height: 100vh;
+            background-color:whitesmoke;
+        }
+        .container2 h1{
+            width: 95%;
+            margin: 10px;
+            padding: 10px;
+            background-color: purple;
+            color:white;
+            font-size: 30px;
+        }
+        .container2 form{
+            margin: 10px;
+        }
+        .container2 form input{
+            margin: 10px;
+        }
+        .closable {
+            padding: 10px;
+            margin: 10px;
+            position: relative;
+        }
+        .closable .close {
+            position: absolute;
+            top: 5px;
+            right: 25px;
+            cursor: pointer;
+            color: white;
+        }
+        .closable .tick {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+            color: white;
+        }
+        .closable.completed {
+            text-decoration: line-through;
+        }
+        #style{
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="whole">
+    <div class="container">
+        <div class="city">
+            <div class="closable" id="delete">
+                <span class="close" onclick="deleteDiv('delete')"> <span id="style">&#10006;</span> </span>
+                <span class="tick" onclick="Strikethrough('delete')"> <span id="style">&#10004;</span> </span>
+                <h2>University Of America</h2>
+                <p class="short-name">USA</p>
+            </div>
+        </div>
+        <div class="city">
+            <div class="closable" id="delete">
+                <span class="close" onclick="deleteDiv('delete')"> <span id="style">&#10006;</span> </span>
+                <span class="tick" onclick="Strikethrough('delete')"> <span id="style">&#10004;</span> </span>
+                <h2>United State</h2>
+                <p class="short-name">UK</p>
+            </div>
+        </div>
+        <div class="city">
+            <div class="closable" id="delete">
+                <span class="close" onclick="deleteDiv('delete')"> <span id="style">&#10006;</span> </span>
+                <span class="tick" onclick="Strikethrough('delete')"> <span id="style">&#10004;</span> </span>
+                <h2>Dubai</h2>
+                <p class="short-name">DB</p>
+            </div>
+        </div>
+    </div>
+    <div class="container2">
+        <h1>Fill out the form</h1>
+        <form action="" name="city-form"  id="myForm">
+            <label for="city">City</label> <br>
+            <input id="city" name="mycity" type="text"> <br>
+            <label for="short-name">Short Name</label> <br>
+            <input id="short-name" name="short-name" type="text"> <br>
+            <input type="submit">
+        </form>
+        <p id="warning" style="display: none; color: red;">Please fill out all details.</p>
+        <p id="success" style="display: none; color: green;">Successfully!</p>
+    </div>
+    </div>
+</body>
+<script>
+    //getElementsByClassName
+    const short_name = document.getElementsByClassName("short-name");
+    console.log(short_name);
+    console.log(typeof short_name);
+    for(i=0;i<short_name.length;i++)
+    {
+        console.log(short_name[i]);
+        short_name[i].style.fontSize = "20px";
+        short_name[i].style.color = "white";
+    }
+    //querySelectorAll
+    const city = document.querySelectorAll(".city");
+    console.log(city);
+    console.log(typeof city);
+    city.forEach((element)=>console.log(element))
+    //create form
+    document.getElementById("myForm").addEventListener("submit", function(submit) {
+    submit.preventDefault();
+    var cityInput = document.getElementById("city").value;
+    var shortNameInput = document.getElementById("short-name").value;
+    
+    var warningMessage = document.getElementById("warning");
+    var successMessage = document.getElementById("success");
+
+    if (cityInput === '' || shortNameInput === '') {
+        warningMessage.style.display = "block";
+        successMessage.style.display = "none";
+    } else {
+        warningMessage.style.display = "none";
+        successMessage.style.display = "block";
+    
+    }
+    //create Element
+    let newCity = document.createElement("div");
+    newCity.classList.add("city");
+    console.log(newCity);
+
+    let cityName = document.createElement("h2");
+    cityName.innerText = cityInput;
+    console.log(cityInput);
+    console.log(cityName);
+
+    let shortName = document.createElement("p");
+    shortName.classList.add("short-name");
+    shortName.innerText = shortNameInput;
+    console.log(shortName);
+
+    newCity.appendChild(cityName);
+    newCity.appendChild(shortName);
+
+    // Append the new city element in container
+    const container = document.querySelector('.container');
+    container.appendChild(newCity);
+    console.log(container);
+
+    // Clear input
+    document.getElementById("city").value = '';
+    document.getElementById("short-name").value = '';
+});
+    //delete the div close
+    function deleteDiv(id) {
+      const element = document.getElementById(id);
+      element.parentNode.removeChild(element);
+    }strikethrough
+    //strikethrough tick
+    function Strikethrough(id) {
+      const element = document.getElementById(id);
+      element.classList.add('completed');
+    }
+</script>
+</html>
