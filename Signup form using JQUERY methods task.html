@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup Form</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    input[type=text], input[type=email] {
+      width: 80%;
+      padding: 12px 20px;
+      margin: 20px 40px 0px 40px;
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    input[type=submit] {
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 14px 20px;
+      margin-left: 40px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: #474e5d;
+      padding-top: 50px;
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto 15% auto;
+      border: 1px solid #888;
+      width: 80%;
+    }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 30px;
+      font-size: 50px;
+      cursor: pointer;
+    }
+    h2 {
+      color: #333;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      margin-left: 30px;
+    }
+    #seleteheading {
+      margin-top: 15px;
+      margin-bottom: 0;
+    }
+    #selete {
+      margin-left: 43px;
+      margin-top: 5px;
+      width: 15%;
+    }
+    button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      margin-left: 40px;
+      margin-top: 20px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #4CAF50;
+      color: #fff;
+    }
+  </style>
+  <script>
+    $(document).ready(function () {
+      // show the signup 
+      $("#btnSignup").click(function () {
+        $("#signupModal").show();
+      });
+
+      // Close the signup
+      $("#btnCancel").click(function () {
+        $("#signupModal").hide();
+      });
+
+      // Initialize form validation
+      $("#signupForm").validate({
+        rules: {
+          firstName: "required",
+          lastName: "required",
+          email: {
+            required: true,
+            email: true,
+          },
+          selete: "required",
+        },
+        messages: {
+          firstName: "Please enter your firstname",
+          lastName: "Please enter your lastname",
+          email: {
+            required: "Please enter your email",
+            email: "Please enter a valid email address",
+          },
+          selete: "Please select a firstname",
+        },
+      });
+
+     //get first name in sessionstorage
+     var storedFirstName = sessionStorage.getItem('storedFirstName');
+     if (storedFirstName) {
+     // Append the storedFirstName in select option
+     $("#selete").append(`<option value="${storedFirstName}">${storedFirstName}</option>`);
+     }
+
+      // submit
+      $("#btnSubmit").click(function () {
+        //Validate form
+        if ($("#signupForm").valid()) {
+          // Get form input values
+          var firstName = $("#firstName").val();
+          var lastName = $("#lastName").val();
+          var email = $("#email").val();
+          var seletefn = $("#selete").val();
+
+          // Create a table row
+          var row =  `<tr id="${firstName}"><td> ${firstName} </td><td> ${lastName} </td><td>  ${email} </td></tr>`;
+        
+          //create a select input filed 
+         $("#selete").append(`<option value="${firstName}">${firstName}</option>`);
+ 
+          //Append the table
+            if(($('#signupTable tbody tr').length)==0){
+            $("#signupTable tbody").append(row);
+            }
+            else
+            {
+            
+            //add the select input filed in table firstname after
+            var selecttable = $("#selete").val();
+            var targetRow = $("#"+selecttable).after(row); 
+            } 
+
+            //set firstname in sessionstorage
+          sessionStorage.setItem('storedFirstName', firstName);
+          console.log(storedFirstName);
+
+            //Clear form
+          $("#firstName").val("");
+          $("#lastName").val("");
+          $("#email").val("");
+          $("#selete").val("");
+          
+          //Close the signup
+          $("#signupModal").hide();
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+  <h2>Signup Form</h2>
+  <button type="button" id="btnSignup">Signup</button>
+
+  <div id="signupModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="btnCancel">&times;</span>
+      <form id="signupForm" method="post">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName" required>
+
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required> <br>
+
+        <label for="seleteheading" id="seleteheading" name="seleteheading">Select the First Name:</label>
+        <select id="selete" required>
+          <option value="None" selected>None</option>
+        </select>
+
+        <button type="button" id="btnSubmit">Submit</button>
+      </form>
+    </div>
+  </div>
+  <h2>Signup Details</h2>
+  <table id="signupTable">
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+  </table>
+</body>
+</html>
