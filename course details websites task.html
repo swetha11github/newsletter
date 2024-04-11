@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course details</title>
+    <style>
+        body{
+            background-color: lavender;
+            color: black;
+        }
+        h1{
+            font-weight: bold;
+            text-align: center;
+            font-size: 50px;
+        }
+        ul {
+            list-style-type: none;
+            margin: 20px;
+            padding: 0;
+            overflow: hidden;
+            background-color: #b793d2;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.10);
+        }
+        li {
+            float: left;
+        }
+        li a {
+            display: block;
+            color: black;
+            font-size: 21px;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+        li a:hover:not(.active) {
+            background-color: #7748b1;
+        }
+        li {
+            float: left;
+            border-right:1px solid #bbb;
+        }
+        li:last-child {
+            border-right: none;
+        }
+        .active {
+            background-color: #9169c1;
+        }
+        .card {
+            margin: 50px;
+            margin-top: 30px;
+            border: 1px solid #ccc;
+            float: left;
+            width: 340px;
+            height: 350px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            text-align: center;
+        }
+        .card:hover {
+            border: 1px solid #777;
+        }
+        .card img {
+            width: 100%;
+            height: auto;
+        }
+        .card h1 {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        .card p {
+            margin-bottom: 5px;
+        }
+        .sidebar {
+            width: 250px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .filter {
+            margin: 0;
+        }
+        .filterButton{
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Premium Courses</h1>
+    <nav>
+        <ul id="navbar"></ul>
+    </nav> 
+    <div class="sidebar">
+        <h2>Duration</h2>
+        <form id="durationfilter">
+            <input type="checkbox" name="duration" value="2 months">2 Months<br>
+            <input type="checkbox" name="duration" value="3 months">3 Months<br>
+            <input type="checkbox" name="duration" value="4 months">4 Months<br>
+            <input type="checkbox" name="duration" value="5 months">5 Months<br>
+            <input type="checkbox" name="duration" value="6 months">6 Months<br>
+        </form>
+    </div>
+    <div class="container" id="courseCards"></div>
+</body>
+<script>
+    const courses = [
+    {
+        image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASYAAACsCAMAAADhRvHiAAABUFBMVEUiQW/////nbwBTgqAiQXAiQW4fPmz9/Pv///0/WHccPnEdOm1VaosjQnAfPWxUhKFhco6qtcYGMmVWg6X///odQGpKdJgdPGgiRXHr7vFBZ40jR27wcQBTgKJJcZZDa4/kcQArUXc6XoYmQGftdADgbQD0cAAZPncaQneOnq+3wtAALGETN2Xx9flBY5AyV35QeZ8xV3w1RWZvVUXDaQ9USWKuYyadXCuYXj1eTliQVzy1XycEPmzNZhnFYyEAO3pzSlc/QGG9aiWLT0AxQ1zTawUuPW6qZiMRQmZfT0/paQj6agCWYC6pXCo8SVcUNXpQS1NgRVNqUkmMXzZ8U0ieWTaEW0NtWEpPQmHcdgBrSkrUbRdERFhISE6MWjqmYyV6U0uAi6vW2+afrLixxMxziZqDWi3S1eUAJ2VseqCYobxsgJo9UoAARGmot8CRoK6zteHhAAAP8klEQVR4nO1c+1vbyBW1xczYjNAYJI8lW5aNbIxt/IQlb2fT0pBN6LbNptm02dB04yTNA7f9/3/rvSMZDGHZhYLBZM735Ysle6zR4T7OvTNyIqGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhMU0QwuVlz2EGQKv16mXP4eqDbHwjrMuexNUHkZs3+GVPYgbAb96rX/YcZgD8Vm2DXPYkrj747T/e4ZRe9jSuOuq3i3dNT9P0K+D3jJsDqaP4SYCg1Li//O2DauOyZ3KlQQSv7izfa1TFZc/kSqMq+PPiyh8GCU3TSaANedNY+Z1sPLrsmVxp0MGNmrH8e62bTgYRN4vGltQ0nQx5x9hZ+YNOcyeBiPrD7aKx/Uj3m06CbFS/WzVWv3lc1xr8BJjylrFjvJJVHZp+EUJy/+7KzrLxxNUF3S9D1OXd4s7LP35vcsEuezJXF4L+qWgYK1uCSh3BfwFU1qsgmIydV3+OWwPSFfCKU914moD8y9PNFcMobv/wwIyqOUkanMsbG9qyDkAGz5aNZaNYeyJpnOYkl7u3t37eYNqaYhBp/hX8DVkyCRxBdOKcPv+2dmuDE6JpijF4dHPVQI97MsC2HGjx+saPteK3P5gN7XL7aDzdXK0tg6zcrTcoGA+t7940VmqvXc81dasXQRiVEJaKy0Vj5f5DTrFe4dU/ba+sbu7yBiN69RdBWaPBX4AOMIzVf0IhBx5Xly+2izurL4R2t33QhFm9jWHJMF4PXMFIorEL6mnl5TP+UC/87oNQ88dizagVa38zKeEJOvjdNgjxzb83CPcve3JXB4TfAk1pLNee8cdcEFK/+9LYWd2iUjfCJ8H+quLS8jcNwgSxHv8LGwTfPRREdy/3ARryJ1CUy8bKiwcm5eB0L4o7teKmxz2ut4Htg9QfvlI57pbL1WLvU6Cs+HKX6hw3CTK4pVxuc6OBxS6pbq3WisbrutTVyST4LgQiKFHuDKpQuRH+c7G2s/pq4/wbvMJybUTb5DPY7uPPikjTfakW5Xh1Cw6Lt8T5t8EF6zUj+DO44s5fo88Vn9cxFsn6P5RpvTj/Io6I9kIyQmUWrQn0N1DzZ4F/Ylr/ZqVmLK9iaDrnQo4KcyEV0TQ/g5U0WtOyUasSzP7ExNJuufhPTs67q0vJbNP0Eyrw7YHqu0U0weHuue+6nHWadkEnGTXIc3BA+c+qAobgNAWaCGNS6Q7myugFpSQCXD1OIp46JxL4tsUSgqjg4DJmTbXv7A220JwGihZJbxhKH2w/bJxznD2GJkY44XarZbdsxtU5iv8rmvY3w1DG4LhOIrULvLaVrDD5dNvO8sGTGvCyqzomwhevor7Td9Vz9oxjaKLt9vxec2lpbam5SG3UIBbzfU9hXAOwhDr0PTwgwhaVNzAARixU29Ncuye0sWXUjBcm1rlc1m+vIGu14nMuyHkydZQmIVr+52FHnUgnk/m3kruWaL/p5BUqXDkX70WHnTdtapnthaV8Cj6czsK/4V5LeOc4wZNBHtWfQnWyOYgPnxoRtnfr56oxj9LEwrUO8hMjnRx2TcJkNz61Vxe4n+HBXnTYWWAJd/FDMjkxIPnOmt5aBhG0/nrVWH3ixgtzUYlXK96rnqv3H6XJ7Saz6YnbzmbzPifSHkaHazZcnHittejwgyuI20xODgCbWrOnZk7Ukmywtbp8HxQlEkU2tlE6GbWV5w/Os5FylCbaWlImkY5uHd5Kv2txaTcjCvIUUwhvdyLDabY582RefTabzqbUN6XS7+1znOGvQVYfba4W//XAx5lR/two1lTP4FwfOzxKU9XsdVLpdCc/hACVVu90LGqJ+bSymTR4GRQFi7HlhC6Msd+DzaVhAIzAAdnku2nSRMS/d1+u1jY4mhMjie9XUBPsLP9wkbGJevbb5Ic3I/vjR+u/iqZU+lM7wcDrkKbs5zZ8Bj6irGmtRXBq/jC19ImYtj0/VOaX7HhTLA+pZzbu1IpbdZNgj6DB7qnwZDwfnOdFjgoCKXqL7QHoSle0PkTe9NlmCVtFoHT2AxpKexjR9N5EmhJicd62IQMLe76DNKWSC1NuNgx+Bg0wiGI2CHNkaeViaYK7hpvnpmmKj0uKpvQSUCMXIn9CQ+GhGpHurEdsCA7FgWybnNvDSBcsTpcmIh88Xzbi7fJkcBcLlpU753mFY2jyXLsdLuwBovSmaPJUrgMSPolE+42KQem1OARx5rb4aBEGvFfRfOo0JSSrPytusgaEJpAraE472+5FCgKLmO29tXysLyesSeW6dCq91E6017KKsj0TZ0gTtt8c5icVwdRpAgx+Kr6uq364pPeNYvE1v0iamL0wTB6Goom4XWVByWFbVPNIUzJvYaCWVruZP/z5S6Hp0b9/2n6KW8EF45tGcfPRuT6LcZSm9mInnUodQ5NSmPBGJ+TzyueSSy1Ukby9lExdAZqoOXjyI3Yn+OPqq9XaD4/5pMa1GGMJK8HOOq9DNFEiFjrKUuBUqhNXLYomUbU/R9JpsbWHVpVOLnKsENrNdBp8Ed+BEemphXBKqSvdSSoIf/oQY9PjG8byCz5hS9jc8SulXC5XqviSncXKDtEk6621SCsl1/bmLfmfA2sCFVfJKrNpfkSdnsrmTfQ55kUel84vLc6HSpBPgyYwDhlWCqXCaIIo0UCFWa3fXPnbXyY3WViJRKVQqJRzzlxmrizPoukOOx2nnahI+Wy3GcG6ZUwTS7BWpDDXPg6jWG5bcH0zKoJTnUUcYU+BJnQdOuqWAidXCQ8FIEHRhurPNp/UHx/ponjSdQXv5YK5TM4/A0+HaCKiHFex86YQWN6l962JJVr/VdY0tNF+UukF9SMkdjOrHG3YaiQ8dvE0ESFcvxDMOf2Cd2ykIb//freBHdiIDCbEQUeFytwc8HQGvztEE5fjxaieCTrcXjuITXjFBTS1dGeE0Ss7jOZov1WxLDu0YT7t0YXTxGQv52TmgoKk9FirIA8ZtlSpookJoGtiMYr5wdycU3H/P5qIO4ppWmrbLf55ItMBLHeojOtzNnJLdRKkpvpM8lOr1QqHFx3CWVh2HPCcgkuOZwkzHSomFjHkjbrd3j5NRLiFzNxczjv19A7RJIQZNUVAHi39Zxg3nsY0QVJThhOFr1izi4W429T58HYtn01dqCAgwgsycJ9wpyEYk4ueBVwowEsBzAghXSk9L+xVCuV+kHFKo0k6WYijT7++TamIaergYPttekIEZSdiE1pTNz2WSGlwsugLvOHBiBRKrtQFFivC6juOg3fqBP1yodcLw9CPAK96vQpkNMj7QeBkFIJSj0arPzGQpsyZaDIXYnPwUHRs5A+al6nkMDtB00EPE2WBHV/c3jugFSwtD1xdHE2gf9ZLaFAYYhQCoASJc9T/jvJIsLeME+TKldBPjEN5DHFmazIXIxPJK481FzoHd938NOl0HBRmctzQnR9vRlPF3pjZ7OJS8mJLXwIxx+uCyfTHvEwCSAtARBYqPY+gCx4N1cJdBw779NQhXMoo4mCiR/vg7fBdJw5Pe/bjDgJbcQgm9jkctg6+wlZrBsBU593I3uvkYcQFy0sIS1Sin6Gb7QM90PMkFQh2XIBnxAVF4JTPULMQO14YWWshTSBLWqO9ZrP5ft40eRsX4yxrvM7JWGVeYeGQROPthWZzqbkXtjl1MViMLrZ5GfEQJTN4oUhRiU2Fc0LELz0/R1gI3joX0tPSJNqtZjai6b3pqilwQtQCLreo+sNIKfa/lXCov7kgh2mQlMPnWyY3hfRAljJzGiuagpDT/TUgFdJcJuMUTksSld29D1FgyXbqiZna3wQWMxqdaoSVoGVnzimdehGRhfm49ZYCuThTj8AQtt4vkVP9aCMTXciCpdPvXiUb+bi3lB6SWXrSWlAf3KcAcYmQhIpEOHmIEFFsIgkIFa70IdPFN0UElDnlzJxTOKWnqsF+PlKF6fxopjY3EVpwoIbt+VLE8Tzig0WH0g/XC+Ug13NZbG4QTr2S4+Qq7rEp8FeuBjRBgZ9NrvnmDNkS0lSC+hc0JWokUAIjSMeW5Y1rlH6ASh2iddeKzYmIUT8TFDyVIU99tRAblMO1hdaMbXYG2+gDEQFI7rljkIkKPydw+qHaxsb8stPvergn6wxXY96bN596rn0B+6gvGBbzCn3nWI5ipkBslwo9DwM2pd1+qeKfwd0iEN5ut888+nJBXeoVSn1lOgd0RQfoiz2fovhEjeR1wZDccfw6w6UY9cTsmdIY4EMqGnW7uRilQhcile9hX4UlwMPUvUUB6uzWgH2axMyypIDFCmPuGMqCZtM9LhiqplMVHW4tRi/TNE0AY01cncUOMVNlxNTAqF+oHF/GqmacfqROgXQDZ12IL4giWLWQM6+DXzO4FZTa5fUQ1wsgeGMEl1CLSM+DSiVXXpeKwq/dE7ErotDv50rlsmpgFsrlUhAE0flyyHTSw05k5qA0yTiTZUosxEsj8ZWmPZSKkPihWqE0zDnBl/VKxFQQOEGpMr3HHa4UUDyCNjJjZ5K9UuA4kxa0j6Bf8K0ZrcP+bwhGpY+bcKL2rhDU7xVyuHg5F61fYvckCEqF0KMu+zIJznjJ8VsA+UyGwEmQw2U4dQpbl5DkpBeuA3eISmU99KQSA2Rc0k18xcEjXNcTLMGk38s5DviS+2UCEwf4cg3zAFSWwoud5yXDEqQCYShYlyeXtuzEcERlv3ydVSe4Wx8yfuC74GXH02RZkZA87k1K0d6Y6+cCZU3XU3KyhAjVhh0wJoEPGJ8qgxHgD1stENhwEQG/77omQFFQNGUyuN2Snhh/DoFEfZaEh7Hf6Vf82e1B/hawSrw4gHtOcgXIZtiexC4T/QLqPPafJG4H83qFQqmPYa3c81xKBBWiN80HtKYKuV4Ogv16JAPqMVeC9L8ehgcbwQ72g63jdrAybgdTH3eA2R4kSChwILR53dLpN+7MCEAe+SHc+bis3cf+tqYYai+d8k98D17n1PqKq/IjCHivEgThtW2yEEEodV3q+WAq5RJuG5xzkKNIeY+ruXEZrJjrgwxF73Sx/QQADw0LfacfXv/fwAJlrXrfCcsLw57qnJRLpdJ4YaUEh+CKvTD0rES8ap5Q6tOl/nq5n1Erv5d8D9MCG+/+wttnuKFXKrBoiSVW43H8YWpLQaXcD8D4+mX/K/pNbAv3Dipvwv0lDMUjGXd71ZKcWsjEPAiZrlJQ2zQh6pd7FHLdV/Oj2Mwadbulskp0nocaAB+HgsilXuFvkmAEU6lOhSwIVP3yenhM2/x6A8kAP8pFya3f75f2kev3lXKI2ipAUA7oDH3p4l776yqXfhmM4rPtBNfGD0XxCBjJVZ6zIEFK1Xi6rlLpN4KxcQPlAPtnvnZyJrHvTBFHR05qaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhcRfwP/vWuB/XIdbQAAAAASUVORK5CYII=",
+        title: "JAVA",
+        Amount: 6000,
+        Duriation: "3 months",
+        category: "Java Programming",
+    },
+    {
+        image: "https://miro.medium.com/v2/resize:fit:700/1*3IcLSFuT8PQg4cUBaRXH1A.png",
+        title: "PYTHON",
+        Amount: 7000,
+        Duriation: "3 months",
+        category: "Python programming",
+    },
+    {
+        image: "https://img-b.udemycdn.com/course/480x270/3906220_be65_2.jpg",
+        title: "HTML, CSS, JAVA SCRIPT",
+        Amount: 7000,
+        Duriation: "5 months",
+        category: "Web Development",
+    },
+    {
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3J3vpJ4c5pjP5WfNgMNmf47Mv3j1nytqAapXc84Z_hw&s",
+        title: "REACT",
+        Amount: 7000,
+        Duriation: "2 months",
+        category: "Web Development",
+    },
+    {
+        image: "https://bs-uploads.toptal.io/blackfish-uploads/components/seo/content/og_image_file/og_image/1302192/secure-rest-api-in-nodejs-18f43b3033c239da5d2525cfd9fdc98f.png",
+        title: "NODE JS",
+        Amount: 6000,
+        Duriation: "2 months",
+        category: "Web Development",
+    },
+    {
+        image: "https://www.hostinger.com/tutorials/wp-content/uploads/sites/2/2021/11/php-8-2.webp",
+        title: "PHP",
+        Amount: 6000,
+        Duriation: "2 months",
+        category: "Web Development",
+    },
+    {
+        image: "https://miro.medium.com/v2/resize:fit:1400/1*yvz6FsBEh-JGN_miQIMEXA.jpeg",
+        title: "FLUTTER",
+        Amount: 7000,
+        Duriation: "3 months",
+        category: "Mobile Development",
+    },
+    {
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRATlLZOVdpZyseUnvTU4LWxv2Z_08ftHjQWg_5LKAt25SKhifyOUmhtsmRLqJ06Y2PnXA&usqp=CAU",
+        title: "META ANDROID DEVELOPMENT",
+        Amount: 8000,
+        Duriation: "3 months",
+        category: "Mobile Development",
+    },
+    {
+        image: "https://img.freepik.com/premium-photo/android-operating-system-logo-with-3d-smartphone_446318-12.jpg",
+        title: "ANDROID APP DEVELOPMENT",
+        Amount: 9000,
+        Duriation: "3 months",
+        category: "Mobile Development",
+    },
+    {
+        image: "https://www.edubridgeindia.com/blog/storage/2023/07/tally-erp9.jpg",
+        title: "TALLY",
+        Amount: 9000,
+        Duriation: "6 months",
+        category: "Computer Application",
+    },
+    {
+        image: "https://media.licdn.com/dms/image/D4E12AQHC4KcfWWeT_g/article-cover_image-shrink_600_2000/0/1671703088088?e=2147483647&v=beta&t=SmCExQKXzwOwkfExC4r1V-j3tvOOW9hChp9Ttu4VA3k",
+        title: "MS-WORD, MS-EXCEL, MS-POWERPOINT",
+        Amount: 9000,
+        Duriation: "3 months",
+        category: "Computer Application",
+    },
+    {
+        image: "https://is1-ssl.mzstatic.com/image/thumb/Purple116/v4/f6/04/9c/f6049c1d-68a4-2a43-a9f7-84250aa2567f/CorelDraw.png/1200x600bf.png",
+        title: "COREL DRAW",
+        Amount: 6000,
+        Duriation: "2 months",
+        category: "Desktop Publishing",
+    },
+    {
+        image: "https://cdn.mos.cms.futurecdn.net/N7KUzybKi2yJMfPjeHSSFk-1200-80.jpg",
+        title: "PHOTOSHOP",
+        Amount: 5000,
+        Duriation: "2 months",
+        category: "Desktop Publishing",
+    },
+    {
+        image: "https://www.scan-safety.com/scanlogo.jpg",
+        title: "SCANNING",
+        Amount: 5000,
+        Duriation: "4 months",
+        category: "Desktop Publishing",
+    },
+    ];
+    function displayCourses(courseList) {
+    const courseCardsContainer = document.getElementById('courseCards');
+    courseCardsContainer.innerHTML = '';
+
+    courseList.forEach(course => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+        <img src="${course.image}" alt="${course.title}">
+        <h1>${course.title}</h1>
+        <p>Category: ${course.category}</p>
+        <p>Duriation: ${course.Duriation}</p>
+        <p>Amount: ${course.Amount}</p>
+        `;
+        courseCardsContainer.appendChild(card);
+    });
+    }
+    function createNavbar() {
+    const navbar = document.getElementById('navbar');
+    const categories = [...new Set(courses.map(course => course.category))];
+    const allCategory = document.createElement('li');
+    allCategory.innerHTML = `<a href="#" data-category="All">All</a>`;
+    navbar.appendChild(allCategory);
+    categories.forEach(category => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `<a href="#" data-category="${category}">${category}</a>`;
+        navbar.appendChild(listItem);
+    });
+    navbar.addEventListener('click', function (event) {
+        const category = event.target.getAttribute('data-category');
+        filterCourses(category);
+    });
+    }
+    function filterCourses(category) {
+    const filteredCourses = (category === 'All') ? courses : courses.filter(course => course.category === category);
+    displayCourses(filteredCourses);
+    }
+    displayCourses(courses);
+    createNavbar();
+    function createNavbar() {
+    const durationFilterForm = document.getElementById('durationfilter');
+    durationFilterForm.addEventListener('change', function (event) {
+        const durations = Array.from(durationFilterForm.querySelectorAll('input[name="duration"]:checked')).map(checkbox => checkbox.value);
+        filterCoursesDuration(durations);
+    });
+}
+function filterCoursesDuration(durations) {
+    const filteredCourses = durations.length === 0 ? courses : courses.filter(course => durations.includes(course.Duriation));
+    displayCourses(filteredCourses);
+}
+</script>
+</html>
